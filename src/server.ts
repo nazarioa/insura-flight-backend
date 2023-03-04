@@ -6,6 +6,13 @@ import {
 	getFlight,
 	updateFlight,
 } from './Controllers/flightController.ts'
+import {
+	createPilot,
+	deletePilot,
+	getAllPilots,
+	getPilot,
+	updatePilot,
+} from './Controllers/pilotController.ts'
 
 const app = new Application()
 const router = new Router()
@@ -20,6 +27,12 @@ router.get('/', (ctx: RouterContext) => {
 	.post('/flight', createFlight)
 	.put('/flight/:id', updateFlight)
 	.delete('/flight/:id', deleteFlight)
+	// pilot
+	.get('/pilots', getAllPilots)
+	.get('/pilot/:id', getPilot)
+	.post('/pilot', createPilot)
+	.put('/pilot/:id', updatePilot)
+	.delete('/pilot/:id', deletePilot)
 
 // Here, we are telling our application to use the router
 app.use(router.routes())
