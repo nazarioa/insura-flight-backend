@@ -20,6 +20,7 @@ import {
 	updateAircraft,
 } from './Controllers/aircraftController.ts'
 import { Application, Router, RouterContext } from 'oak/mod.ts'
+import { doTheDatabase } from './sqlight.ts';
 
 const app = new Application()
 const router = new Router()
@@ -50,5 +51,6 @@ router.get('/', (ctx: RouterContext) => {
 // Here, we are telling our application to use the router
 app.use(router.routes())
 app.use(router.allowedMethods())
+await doTheDatabase()
 app.listen({ port })
 console.log(`Server is running on port ${port}`)
