@@ -1,5 +1,4 @@
 import { RouterContext } from 'oak/mod.ts'
-import { doTheDatabase } from '../sqlight.ts';
 import { Aircraft } from '../models.ts'
 
 export const getAllAircraft = async (ctx: RouterContext) => {
@@ -9,9 +8,9 @@ export const getAllAircraft = async (ctx: RouterContext) => {
 export const createAircraft = async (ctx: RouterContext) => {
 	const { nNumber, make, model } = await ctx.request.body().value
 
-  const id = await aircraftsCollection.insertOne(aircraftEntry)
-  ctx.response.status = 201
-  ctx.response.body = {id}
+	const id = await Aircraft.create({ nNumber, make, model })
+	ctx.response.status = 201
+	ctx.response.body = { id, nNumber, make, model }
 }
 
 export const getAircraft = async (ctx: RouterContext) => {
@@ -26,8 +25,6 @@ export const getAircraft = async (ctx: RouterContext) => {
 }
 
 export const updateAircraft = async (ctx: RouterContext) => {
-  await doTheDatabase()
-
   const aircraftId = await ctx.request.body().value;
   // update aircraft in DB
   ctx.response.status = 201
