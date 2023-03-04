@@ -1,4 +1,3 @@
-import { Application, Router, RouterContext } from './deps.ts'
 import {
 	createFlight,
 	deleteFlight,
@@ -20,6 +19,7 @@ import {
 	getAllAircraft,
 	updateAircraft,
 } from './Controllers/aircraftController.ts'
+import { Application, Router, RouterContext } from 'oak/mod.ts'
 
 const app = new Application()
 const router = new Router()

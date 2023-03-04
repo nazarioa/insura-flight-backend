@@ -1,4 +1,4 @@
-import { DataTypes, Model } from './deps.ts'
+import { DataTypes, Model } from 'denodb/mod.ts'
 
 export class Pilot extends Model {
 	static table = 'pilots'

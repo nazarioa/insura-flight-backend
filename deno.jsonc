@@ -1,4 +1,18 @@
 {
+  "imports": {
+    "oak/": "https://deno.land/x/oak/",
+    "denodb/": "https://deno.land/x/denodb/",
+    "std/": "https://deno.land/std@0.177.0/"
+  },
+  "scopes": {
+    "https://raw.githubusercontent.com/Zhomart/dex/930253915093e1e08d48ec0409b4aee800d8bd0c/lib-dyn/deps.ts": {
+      "https://deno.land/std/node/assert.ts": "https://deno.land/std@0.177.0/node/assert.ts",
+      "https://deno.land/std/node/events.ts": "https://deno.land/std@0.177.0/node/events.ts",
+      "https://deno.land/std/node/stream.ts": "https://deno.land/std@0.177.0/node/stream.ts",
+      "https://deno.land/std/node/url.ts": "https://deno.land/std@0.177.0/node/url.ts",
+      "https://deno.land/std/node/util.ts": "https://deno.land/std@0.177.0/node/util.ts"
+    }
+  },
   "tasks": {
     "hook": "deno run --allow-read --allow-write https://deno.land/x/deno_hooks@0.1.0/mod.ts"
   },

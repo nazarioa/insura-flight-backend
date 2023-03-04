@@ -1,4 +1,4 @@
-import { RouterContext } from './deps.ts'
+import { RouterContext } from 'oak/mod.ts'
 
 export const getAllFlights = async (ctx: RouterContext) => {
 	// const flights = await flightsCollection.find()
