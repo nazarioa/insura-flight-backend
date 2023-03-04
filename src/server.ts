@@ -20,7 +20,7 @@ import {
 	updateAircraft,
 } from './Controllers/aircraftController.ts'
 import { Application, Router, RouterContext } from 'oak/mod.ts'
-import { doTheDatabase } from './sqlight.ts';
+import { doTheDatabase } from './sqlight.ts'
 
 const app = new Application()
 const router = new Router()
