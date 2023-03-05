@@ -34,14 +34,20 @@ export const createAircraft = async (ctx: RouterContext) => {
 }
 
 export const getAircraft = async (ctx: RouterContext) => {
-	const nNumber = await ctx.request.body().value
-	const aircraft = await Aircraft.find({ nNumber })
-	if (aircraft) {
-		ctx.response.status = 200
-		ctx.response.body = { aircraft }
-	} else {
+	const nNumber = ctx.params.nNumber
+	const existingAircraft = await Aircraft
+		.where('nNumber', '=', nNumber.trim().toString())
+		.first()
+
+	if (!existingAircraft) {
 		ctx.response.status = 404
+		ctx.response.body = { 'error': 'Aircraft not found' }
+		return
 	}
+
+	ctx.response.body = existingAircraft
+	ctx.response.status = 200
+	return
 }
 
 export const updateAircraft = async (ctx: RouterContext) => {
