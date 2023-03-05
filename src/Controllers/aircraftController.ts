@@ -58,7 +58,23 @@ export const updateAircraft = async (ctx: RouterContext) => {
 }
 
 export const deleteAircraft = async (ctx: RouterContext) => {
-	const nNumber = await ctx.request.body().value
-	const aircraft = await Aircraft.deleteById(nNumber)
-	ctx.response.status = 200
+	const nNumber = ctx.params.nNumber
+	const existingAircraft = await Aircraft
+		.where('nNumber', '=', nNumber.trim().toString())
+		.first()
+
+	if (!existingAircraft) {
+		ctx.response.status = 200
+		ctx.response.body = { 'message': 'Aircraft deleted' }
+		return
+	}
+
+	try {
+		await existingAircraft.delete()
+		ctx.response.status = 200
+		ctx.response.body = { 'message': 'Aircraft deleted' }
+	} catch (e) {
+		ctx.response.status = 403
+		ctx.response.body = { 'error': 'Could not delete Aircraft' }
+	}
 }
