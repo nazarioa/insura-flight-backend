@@ -3,6 +3,8 @@ import { Aircraft } from '../models.ts'
 
 export const getAllAircraft = async (ctx: RouterContext) => {
 	ctx.response.body = await Aircraft.all()
+	ctx.response.status = 200
+	return
 }
 
 export const createAircraft = async (ctx: RouterContext) => {
