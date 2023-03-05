@@ -1,6 +1,7 @@
 import { RouterContext } from 'oak/mod.ts'
 import { Flight } from '../Models/Flight.ts'
-import { FlightNode } from '../types.ts'
+import { FlightEntry, FlightNode } from '../types.ts'
+import { ResponseCreator } from '../Models/Response.class.ts'
 
 export const getPilotsFlights = async (ctx: RouterContext) => {
 	const pilotId = ctx.params.pilotId
@@ -15,12 +16,28 @@ export const getPilotsFlights = async (ctx: RouterContext) => {
 	}
 }
 
-export const createFlight = async (ctx: RouterContext) => {
-	const flightEntry = await ctx.request.body().value
-
-	const id = await flightsCollection.insertOne(flightEntry)
-	ctx.response.status = 201
-	ctx.response.body = { id }
+export const startFlight = async (ctx: RouterContext) => {
+	const {
+		aircraftNNumber,
+		pilotId,
+		startNode: { gpsLatitude, gpsLongitude, dateTimeEpoc },
+	} = await ctx.request.body().value as FlightEntry
+	const id = crypto.randomUUID()
+	await Flight.create({
+		id,
+		aircraftNNumber,
+		pilotId,
+		startGpsLatitude: gpsLatitude,
+		startGpsLongitude: gpsLongitude,
+		startTime: dateTimeEpoc,
+	})
+	const response = new ResponseCreator(
+		201,
+		'Flight start recorded successfully',
+		{ flightId: id },
+	)
+	ctx.response.status = response.status
+	ctx.response.body = response.payload
 }
 
 export const endFlight = async (ctx: RouterContext) => {

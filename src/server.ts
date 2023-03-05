@@ -1,8 +1,9 @@
 import {
-	createFlight,
 	deleteFlight,
+	endFlight,
 	getFlight,
 	getPilotsFlights,
+	startFlight,
 	updateFlight,
 } from './Controllers/flightController.ts'
 import {
@@ -32,8 +33,9 @@ router.get('/', (ctx: RouterContext) => {
 	// flight
 	.get('/flights/:pilotId', getPilotsFlights)
 	.get('/flight/:id', getFlight)
-	.post('/flight', createFlight)
 	.put('/flight/:id', updateFlight)
+	.post('/flight/start', startFlight)
+	.put('/flight/end/:flightId', endFlight)
 	.delete('/flight/:id', deleteFlight)
 	// pilot
 	.get('/pilots', getAllPilots)
