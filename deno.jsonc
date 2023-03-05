@@ -1,4 +1,7 @@
 {
+  "tasks": {
+    "hook": "deno run --allow-read --allow-write https://deno.land/x/deno_hooks@0.1.0/mod.ts"
+  },
   "compilerOptions": {
     "allowJs": true,
     "lib": ["deno.window"],
