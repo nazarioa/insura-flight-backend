@@ -52,20 +52,17 @@ export class Flight extends Model {
 			type: DataTypes.UUID,
 			primaryKey: true,
 		},
-		startAirport: {
+		aircraftNNumber: {
 			type: DataTypes.STRING,
-			length: 3,
+		},
+		pilotId: {
+			type: DataTypes.UUID,
 		},
 		startGpsLatitude: {
 			type: DataTypes.decimal(8, 6),
 		},
 		startGpsLongitude: {
 			type: DataTypes.decimal(9, 6),
-		},
-		endAirport: {
-			type: DataTypes.STRING,
-			length: 3,
-			allowNull: true,
 		},
 		endGpsLatitude: {
 			type: DataTypes.decimal(8, 6),
