@@ -51,10 +51,31 @@ export const getAircraft = async (ctx: RouterContext) => {
 }
 
 export const updateAircraft = async (ctx: RouterContext) => {
-  const aircraftId = await ctx.request.body().value;
-  // update aircraft in DB
-  ctx.response.status = 201
-  ctx.response.body = {aircraftId}
+	const nNumber = ctx.params.nNumber
+	const existingAircraft = await Aircraft
+		.where('nNumber', '=', nNumber.trim().toString())
+		.first()
+
+	if (!existingAircraft) {
+		ctx.response.status = 404
+		ctx.response.body = { 'error': 'Aircraft not found' }
+		return
+	}
+
+	const { make, model } = await ctx.request.body().value
+	existingAircraft.make = make
+	existingAircraft.model = model
+
+	try {
+		await existingAircraft.update()
+		ctx.response.body = { 'message': 'Aircraft updated' }
+		ctx.response.status = 201
+		return
+	} catch (e) {
+		ctx.response.body = { 'error': 'Could not update Aircraft' }
+		ctx.response.status = 403
+		return
+	}
 }
 
 export const deleteAircraft = async (ctx: RouterContext) => {
