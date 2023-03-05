@@ -10,9 +10,27 @@ export const getAllAircraft = async (ctx: RouterContext) => {
 export const createAircraft = async (ctx: RouterContext) => {
 	const { nNumber, make, model } = await ctx.request.body().value
 
-	const id = await Aircraft.create({ nNumber, make, model })
-	ctx.response.status = 201
-	ctx.response.body = { id, nNumber, make, model }
+	const existingAircraft = await Aircraft
+		.where('nNumber', '=', nNumber.trim().toString())
+		.first()
+
+	if (existingAircraft) {
+		ctx.response.status = 403
+		ctx.response.body = { 'error': 'could not create aircraft' }
+		return
+	}
+
+	try {
+		const id = crypto.randomUUID()
+		await Aircraft.create({ id, nNumber, make, model })
+		ctx.response.body = { 'message': 'Aircraft created' }
+		ctx.response.status = 201
+		return
+	} catch (e) {
+		ctx.response.body = { 'error': e.toString() }
+		ctx.response.status = 500
+		return
+	}
 }
 
 export const getAircraft = async (ctx: RouterContext) => {
