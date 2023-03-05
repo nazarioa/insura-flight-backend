@@ -78,8 +78,23 @@ export const updatePilot = async (ctx: RouterContext) => {
 }
 
 export const deletePilot = async (ctx: RouterContext) => {
-	const pilotId = await ctx.request.body().value
-	// update pilot in DB
-	ctx.response.status = 201
-	ctx.response.body = { pilotId }
+	const id = ctx.params.id
+	const existingPilot = await Pilot
+		.where('id', '=', id.trim().toString())
+		.first()
+
+	if (!existingPilot) {
+		ctx.response.status = 200
+		ctx.response.body = { 'message': 'Pilot deleted' }
+		return
+	}
+
+	try {
+		await existingPilot.delete()
+		ctx.response.status = 200
+		ctx.response.body = { 'message': 'Pilot deleted' }
+	} catch (e) {
+		ctx.response.status = 403
+		ctx.response.body = { 'error': 'Could not delete pilot' }
+	}
 }
