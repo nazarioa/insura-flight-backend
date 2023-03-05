@@ -43,10 +43,10 @@ router.get('/', (ctx: RouterContext) => {
 	.delete('/pilot/:id', deletePilot)
 	// aircraft
 	.get('/aircraft', getAllAircraft)
-	.get('/aircraft/:id', getAircraft)
+	.get('/aircraft/:nNumber', getAircraft)
 	.post('/aircraft', createAircraft)
-	.put('/aircraft/:id', updateAircraft)
-	.delete('/aircraft/:id', deleteAircraft)
+	.put('/aircraft/:nNumber', updateAircraft)
+	.delete('/aircraft/:nNumber', deleteAircraft)
 
 // Here, we are telling our application to use the router
 app.use(router.routes())
