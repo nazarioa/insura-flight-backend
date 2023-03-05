@@ -50,10 +50,31 @@ export const getPilot = async (ctx: RouterContext) => {
 }
 
 export const updatePilot = async (ctx: RouterContext) => {
-	const pilotId = await ctx.request.body().value
-	// update pilot in DB
-	ctx.response.status = 201
-	ctx.response.body = { pilotId }
+	const id = ctx.params.id
+	const existingPilot = await Pilot
+		.where('id', '=', id.trim().toString())
+		.first()
+
+	if (!existingPilot) {
+		ctx.response.status = 404
+		ctx.response.body = { 'error': 'Pilot not found' }
+		return
+	}
+
+	const { firstName, lastName } = await ctx.request.body().value
+	existingPilot.firstName = firstName
+	existingPilot.lastName = lastName
+
+	try {
+		await existingPilot.update()
+		ctx.response.body = { 'message': 'Pilot updated' }
+		ctx.response.status = 201
+		return
+	} catch (e) {
+		ctx.response.body = { 'error': 'Could not update pilot' }
+		ctx.response.status = 403
+		return
+	}
 }
 
 export const deletePilot = async (ctx: RouterContext) => {
