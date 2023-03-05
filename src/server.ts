@@ -1,8 +1,8 @@
 import {
 	createFlight,
 	deleteFlight,
-	getAllFlights,
 	getFlight,
+	getPilotsFlights,
 	updateFlight,
 } from './Controllers/flightController.ts'
 import {
@@ -30,7 +30,7 @@ router.get('/', (ctx: RouterContext) => {
 	ctx.response.body = 'Hello from Deno'
 })
 	// flight
-	.get('/flights', getAllFlights)
+	.get('/flights/:pilotId', getPilotsFlights)
 	.get('/flight/:id', getFlight)
 	.post('/flight', createFlight)
 	.put('/flight/:id', updateFlight)

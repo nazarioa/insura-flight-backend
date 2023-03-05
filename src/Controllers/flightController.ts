@@ -1,8 +1,17 @@
 import { RouterContext } from 'oak/mod.ts'
+import { Flight } from '../Models/Flight.ts'
 
-export const getAllFlights = async (ctx: RouterContext) => {
-	// const flights = await flightsCollection.find()
-	ctx.response.body = await flightsCollection.find()
+export const getPilotsFlights = async (ctx: RouterContext) => {
+	const pilotId = ctx.params.pilotId
+	try {
+		ctx.response.status = 200
+		ctx.response.body = await Flight
+			.where('pilotId', '=', pilotId.trim().toString())
+			.limit(200)
+	} catch (e) {
+		ctx.response.status = 403
+		ctx.response.body = { 'error': 'Could not get Pilots Flight log' }
+	}
 }
 
 export const createFlight = async (ctx: RouterContext) => {
