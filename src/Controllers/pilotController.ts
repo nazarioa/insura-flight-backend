@@ -1,5 +1,5 @@
 import { RouterContext } from 'oak/mod.ts'
-import { Pilot } from '../models.ts'
+import { Pilot } from '../Models/Pilot.ts'
 
 export const getAllPilots = async (ctx: RouterContext) => {
 	ctx.response.body = await Pilot.all()

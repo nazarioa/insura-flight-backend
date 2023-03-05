@@ -1,5 +1,6 @@
-import { Aircraft, Flight, Pilot } from './models.ts'
+import { Aircraft, Flight } from './models.ts'
 import { Database, SQLite3Connector } from 'denodb/mod.ts'
+import { Pilot } from './Models/Pilot.ts'
 
 const connector = new SQLite3Connector({
 	filepath: 'db/flight-database.sqlite',
