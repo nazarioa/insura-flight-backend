@@ -95,8 +95,28 @@ export const updateFlight = async (ctx: RouterContext) => {
 }
 
 export const deleteFlight = async (ctx: RouterContext) => {
-	const flightId = await ctx.request.body().value
-	// update flight in DB
-	ctx.response.status = 201
-	ctx.response.body = { flightId }
+	const flightId = ctx.params.flightId
+	const existingFlight = await Flight
+		.where('id', '=', flightId.trim().toString())
+		.first()
+
+	if (!existingFlight) {
+		const response = new ResponseCreator(200, 'Flight deleted')
+		ctx.response.status = response.status
+		ctx.response.body = response.payload
+		return
+	}
+
+	try {
+		await existingFlight.delete()
+		const response = new ResponseCreator(200, 'Flight deleted')
+		ctx.response.status = response.status
+		ctx.response.body = response.payload
+		return
+	} catch (e) {
+		const response = new ResponseCreator(403, 'Could not delete Flight')
+		ctx.response.status = response.status
+		ctx.response.body = response.payload
+		return
+	}
 }

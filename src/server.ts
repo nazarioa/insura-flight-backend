@@ -36,7 +36,7 @@ router.get('/', (ctx: RouterContext) => {
 	.put('/flight/:id', updateFlight)
 	.post('/flight/start', startFlight)
 	.put('/flight/end/:flightId', endFlight)
-	.delete('/flight/:id', deleteFlight)
+	.delete('/flight/:flightId', deleteFlight)
 	// pilot
 	.get('/pilots', getAllPilots)
 	.get('/pilot/:id', getPilot)
