@@ -17,17 +17,25 @@ export class Flight extends Model {
 			type: DataTypes.UUID,
 		},
 		startGpsLatitude: {
-			type: DataTypes.decimal(8, 6),
+			type: DataTypes.DECIMAL,
+			precision: 8,
+			scale: 6,
 		},
 		startGpsLongitude: {
-			type: DataTypes.decimal(9, 6),
+			type: DataTypes.DECIMAL,
+			precision: 9,
+			scale: 6,
 		},
 		endGpsLatitude: {
-			type: DataTypes.decimal(8, 6),
+			type: DataTypes.DECIMAL,
+			precision: 8,
+			scale: 6,
 			allowNull: true,
 		},
 		endGpsLongitude: {
-			type: DataTypes.decimal(9, 6),
+			type: DataTypes.DECIMAL,
+			precision: 9,
+			scale: 6,
 			allowNull: true,
 		},
 		startTime: {
