@@ -59,24 +59,46 @@ export const endFlight = async (ctx: RouterContext) => {
 	const flightId = await ctx.params.flightId
 	const startedFlight = await Flight
 		.where('id', '=', flightId.trim().toString())
-		.where('endTime', '=', null)
+		// Where null is not yet supported
+		// .where('endTime', '=', null)
 		.first()
 
 	if (!startedFlight) {
-		ctx.response.status = 403
-		ctx.response.body = { 'error': 'Could not end flight' }
+		const response = new ResponseCreator(
+			403,
+			'Could not end flight',
+			{ flightId },
+		)
+		ctx.response.status = response.status
+		ctx.response.body = response.payload
+		return
 	}
 
+	const flightDurationInMinutes =
+		(flightEndNode.dateTimeEpoc - startedFlight.startTime) / 60
+
 	try {
-		startedFlight.endTime = flightEndNode.dateTime
+		startedFlight.endTime = flightEndNode.dateTimeEpoc
 		startedFlight.endGpsLatitude = flightEndNode.gpsLatitude
 		startedFlight.endGpsLongitude = flightEndNode.gpsLongitude
+		startedFlight.durationMinutes = flightDurationInMinutes
 		startedFlight.update()
-		ctx.response.status = 201
-		ctx.response.body = { 'message': 'End of flight recorded successfully' }
+		const response = new ResponseCreator(
+			201,
+			'End of flight recorded successfully',
+			{ flightId, flightDurationInMinutes },
+		)
+		ctx.response.status = response.status
+		ctx.response.body = response.payload
+		return
 	} catch (e) {
-		ctx.response.status = 403
-		ctx.response.body = { 'error': 'Could not end flight' }
+		const response = new ResponseCreator(
+			403,
+			'Could not end flight',
+		)
+		ctx.response.status = response.status
+		ctx.response.body = response.payload
+		return
 	}
 }
 
