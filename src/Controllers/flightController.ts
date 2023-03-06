@@ -10,9 +10,16 @@ export const getPilotsFlights = async (ctx: RouterContext) => {
 		ctx.response.body = await Flight
 			.where('pilotId', '=', pilotId.trim().toString())
 			.limit(200)
+			.all()
+		return
 	} catch (e) {
-		ctx.response.status = 403
-		ctx.response.body = { 'error': 'Could not get Pilots Flight log' }
+		const response = new ResponseCreator(
+			403,
+			'Could not get Pilots Flight log',
+		)
+		ctx.response.body = response.payload
+		ctx.response.status = response.status
+		return
 	}
 }
 
