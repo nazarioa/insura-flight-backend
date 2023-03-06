@@ -24,19 +24,25 @@ export const getPilotsFlights = async (ctx: RouterContext) => {
 }
 
 export const startFlight = async (ctx: RouterContext) => {
-	const {
-		aircraftNNumber,
-		pilotId,
-		startNode: { gpsLatitude, gpsLongitude, dateTimeEpoc },
-	} = await ctx.request.body().value as FlightEntry
+	let flightEntry: FlightEntry = null
+
+	try {
+		flightEntry = await ctx.request.body().value as FlightEntry
+	} catch (e) {
+		const response = new ResponseCreator(402, 'Bad flight creation data')
+		ctx.response.body = response.payload
+		ctx.response.status = response.status
+		return
+	}
+
 	const id = crypto.randomUUID()
 	await Flight.create({
 		id,
-		aircraftNNumber,
-		pilotId,
-		startGpsLatitude: gpsLatitude,
-		startGpsLongitude: gpsLongitude,
-		startTime: dateTimeEpoc,
+		aircraftNNumber: flightEntry.aircraftNNumber,
+		pilotId: flightEntry.pilotId,
+		startGpsLatitude: flightEntry.gpsLatitude,
+		startGpsLongitude: flightEntry.gpsLongitude,
+		startTime: flightEntry.dateTimeEpoc,
 	})
 	const response = new ResponseCreator(
 		201,
@@ -45,6 +51,7 @@ export const startFlight = async (ctx: RouterContext) => {
 	)
 	ctx.response.status = response.status
 	ctx.response.body = response.payload
+	return
 }
 
 export const endFlight = async (ctx: RouterContext) => {

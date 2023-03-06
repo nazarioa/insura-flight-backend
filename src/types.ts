@@ -1,7 +1,6 @@
-export interface FlightEntry {
+export interface FlightEntry extends FlightNode {
 	aircraftNNumber: string
 	pilotId: string
-	startNode: FlightNode
 }
 
 export interface FlightNode {
