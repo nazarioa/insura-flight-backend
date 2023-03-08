@@ -39,10 +39,10 @@
       "exclude": ["src/testdata/"]
     },
     "options": {
-      "useTabs": true,
+      "useTabs": false,
       "lineWidth": 80,
-      "indentWidth": 4,
-      "semiColons": false,
+      "indentWidth": 2,
+      "semiColons": true,
       "singleQuote": true,
       "proseWrap": "preserve"
     }
