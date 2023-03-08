@@ -1,4 +1,4 @@
-import { DataTypes, Model } from 'denodb/mod.ts';
+import { DataTypes, Model } from 'denodb';
 
 export class Aircraft extends Model {
   static table = 'aircraft';

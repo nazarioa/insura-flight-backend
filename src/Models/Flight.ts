@@ -1,4 +1,4 @@
-import { DataTypes, Model } from 'denodb/mod.ts';
+import { DataTypes, Model } from 'denodb';
 
 // For latitudes use: Decimal(8,6), and longitudes use: Decimal(9,6)
 // https://stackoverflow.com/questions/1196415/what-datatype-to-use-when-storing-latitude-and-longitude-data-in-sql-databases

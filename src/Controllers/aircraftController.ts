@@ -1,4 +1,4 @@
-import { RouterContext } from 'oak/mod.ts';
+import { RouterContext } from 'oak';
 import { Aircraft } from '../Models/Aircraft.ts';
 
 export const getAllAircraft = async (ctx: RouterContext) => {
