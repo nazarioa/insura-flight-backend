@@ -24,9 +24,9 @@ export async function doTheDatabase(
     db = new Database(
       new SQLite3Connector(connectionDetails),
     );
+    await db.sync();
   }
   db.link([Flight, Pilot, Aircraft]);
-  await db.sync();
 }
 
 export function getConnectionDetails(): {
