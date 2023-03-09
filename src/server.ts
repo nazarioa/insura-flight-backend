@@ -21,7 +21,7 @@ import {
   updateAircraft,
 } from './Controllers/aircraftController.ts';
 import { Application, Router, RouterContext } from 'oak';
-import { doTheDatabase } from './database-connection.ts';
+import { doTheDatabase, getConnectionDetails } from './database-connection.ts';
 
 const app = new Application();
 const router = new Router();
@@ -53,6 +53,8 @@ router.get('/', (ctx: RouterContext) => {
 // Here, we are telling our application to use the router
 app.use(router.routes());
 app.use(router.allowedMethods());
-await doTheDatabase();
+
+const { connectionType, connectionDetails } = getConnectionDetails();
+await doTheDatabase(connectionType, connectionDetails);
 app.listen({ port });
 console.log(`Server is running on port ${port}`);
