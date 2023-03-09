@@ -22,6 +22,7 @@ import {
 } from './Controllers/aircraftController.ts';
 import { Application, Router, RouterContext } from 'oak';
 import { doTheDatabase, getConnectionDetails } from './database-connection.ts';
+import { oakCors } from 'oakCors';
 
 const app = new Application();
 const router = new Router();
@@ -49,6 +50,8 @@ router.get('/', (ctx: RouterContext) => {
   .post('/aircraft', createAircraft)
   .put('/aircraft/:nNumber', updateAircraft)
   .delete('/aircraft/:nNumber', deleteAircraft);
+
+app.use(oakCors());
 
 // Here, we are telling our application to use the router
 app.use(router.routes());
