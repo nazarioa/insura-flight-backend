@@ -20,11 +20,13 @@ export class Flight extends Model {
       type: DataTypes.DECIMAL,
       precision: 8,
       scale: 6,
+      allowNull: true,
     },
     startGpsLongitude: {
       type: DataTypes.DECIMAL,
       precision: 9,
       scale: 6,
+      allowNull: true,
     },
     endGpsLatitude: {
       type: DataTypes.DECIMAL,

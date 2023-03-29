@@ -24,7 +24,7 @@ export const getPilotsFlights = async (ctx: RouterContext) => {
 };
 
 export const startFlight = async (ctx: RouterContext) => {
-  let flightEntry: FlightEntry = null;
+  let flightEntry: FlightEntry;
 
   try {
     flightEntry = await ctx.request.body().value as FlightEntry;
@@ -35,13 +35,18 @@ export const startFlight = async (ctx: RouterContext) => {
     return;
   }
 
+  if (!flightEntry) {
+    const response = new ResponseCreator(500, 'Something went wrong');
+    ctx.response.body = response.payload;
+    ctx.response.status = response.status;
+    return;
+  }
+
   const id = crypto.randomUUID();
   await Flight.create({
     id,
     aircraftNNumber: flightEntry.aircraftNNumber,
     pilotId: flightEntry.pilotId,
-    startGpsLatitude: flightEntry.gpsLatitude,
-    startGpsLongitude: flightEntry.gpsLongitude,
     startTime: flightEntry.dateTimeEpoc,
   });
   const response = new ResponseCreator(
@@ -52,6 +57,60 @@ export const startFlight = async (ctx: RouterContext) => {
   ctx.response.status = response.status;
   ctx.response.body = response.payload;
   return;
+};
+
+export const gpsUpdateFlight = async (ctx: RouterContext) => {
+  const flightId = await ctx.params.flightId;
+  const flight = await Flight
+    .where('id', '=', flightId.trim().toString())
+    .first();
+
+  if (!flight) {
+    const response = new ResponseCreator(
+      404,
+      'Could not find flight',
+      { flightId },
+    );
+    ctx.response.status = response.status;
+    ctx.response.body = response.payload;
+    return;
+  }
+
+  const flightGpsUpdate = await ctx.request.body().value as FlightNode;
+  if (flightGpsUpdate.flightNode === 'start') {
+    flight.startGpsLongitude = flightGpsUpdate.gpsLongitude;
+    flight.startGpsLatitude = flightGpsUpdate.gpsLatitude;
+    await flight.update();
+    const response = new ResponseCreator(
+      200,
+      'Updated start gps for flight',
+      { flightId },
+    );
+    ctx.response.status = response.status;
+    ctx.response.body = response.payload;
+    return;
+  } else if (flightGpsUpdate.flightNode === 'end') {
+    flight.endGpsLongitude = flightGpsUpdate.gpsLongitude;
+    flight.endGpsLatitude = flightGpsUpdate.gpsLatitude;
+    await flight.update();
+    const response = new ResponseCreator(
+      200,
+      'Updated end gps for flight',
+      { flightId },
+    );
+    ctx.response.status = response.status;
+    ctx.response.body = response.payload;
+    return;
+  } else {
+    const response = new ResponseCreator(
+      400,
+      'Not sure what to update',
+      { flightId },
+    );
+    ctx.response.status = response.status;
+    ctx.response.body = response.payload;
+    return;
+  }
 };
 
 export const endFlight = async (ctx: RouterContext) => {
@@ -74,13 +133,12 @@ export const endFlight = async (ctx: RouterContext) => {
     return;
   }
 
-  const flightDurationInMinutes =
-    (flightEndNode.dateTimeEpoc - startedFlight.startTime) / 60;
+  const flightDurationInMinutes = Math.floor(
+    (flightEndNode.dateTimeEpoc - startedFlight.startTime) / 60000,
+  );
 
   try {
     startedFlight.endTime = flightEndNode.dateTimeEpoc;
-    startedFlight.endGpsLatitude = flightEndNode.gpsLatitude;
-    startedFlight.endGpsLongitude = flightEndNode.gpsLongitude;
     startedFlight.durationMinutes = flightDurationInMinutes;
     startedFlight.update();
     const response = new ResponseCreator(

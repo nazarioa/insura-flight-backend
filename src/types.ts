@@ -1,11 +1,15 @@
-export interface FlightEntry extends FlightNode {
-  aircraftNNumber: string;
-  pilotId: string;
+export interface FlightGps {
+  gpsLatitude: number;
+  gpsLongitude: number;
 }
 
-export interface FlightNode {
+export interface FlightNode extends FlightGps {
+  flightNode: 'start' | 'end';
   dateTimeEpoc: number;
-  gpsLatitude: string;
-  gpsLongitude: string;
-  airport?: string;
+}
+
+export interface FlightEntry {
+  aircraftNNumber: string;
+  dateTimeEpoc: number;
+  pilotId: string;
 }

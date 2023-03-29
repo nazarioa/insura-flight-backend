@@ -3,6 +3,7 @@ import {
   endFlight,
   getFlight,
   getPilotsFlights,
+  gpsUpdateFlight,
   startFlight,
   updateFlight,
 } from './Controllers/flightController.ts';
@@ -35,8 +36,9 @@ router.get('/', (ctx: RouterContext) => {
   .get('/flights/:pilotId', getPilotsFlights)
   .get('/flight/:id', getFlight)
   .put('/flight/:id', updateFlight)
-  .post('/flight/start', startFlight)
   .post('/flight/end/:flightId', endFlight)
+  .put('/flight/gps-update/:flightId', gpsUpdateFlight)
+  .post('/flight/start', startFlight)
   .delete('/flight/:flightId', deleteFlight)
   // pilot
   .get('/pilots', getAllPilots)
