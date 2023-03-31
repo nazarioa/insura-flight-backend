@@ -36,7 +36,10 @@ export const startFlight = async (ctx: RouterContext) => {
   }
 
   if (!flightEntry) {
-    const response = new ResponseCreator(500, 'Something went wrong');
+    const response = new ResponseCreator(
+      500,
+      'Something went wrong' + JSON.stringify(flightEntry ?? {}),
+    );
     ctx.response.body = response.payload;
     ctx.response.status = response.status;
     return;
