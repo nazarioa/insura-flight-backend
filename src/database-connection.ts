@@ -18,11 +18,11 @@ export async function doTheDatabase(
 
   if (connectionType === 'mysql') {
     db = new Database(
-      new MySQLConnector(connectionDetails),
+      new MySQLConnector(connectionDetails as MySQLOptions),
     );
   } else {
     db = new Database(
-      new SQLite3Connector(connectionDetails),
+      new SQLite3Connector(connectionDetails as SQLite3Options),
     );
     await db.sync();
   }
