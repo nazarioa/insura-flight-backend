@@ -16,17 +16,17 @@ export async function doTheDatabase(
 ) {
   let db = null;
 
-  // if (connectionType === 'mysql') {
-  //   db = new Database(
-  //     new MySQLConnector(connectionDetails as MySQLOptions),
-  //   );
-  // } else {
-  //   db = new Database(
-  //     new SQLite3Connector(connectionDetails as SQLite3Options),
-  //   );
-  //   await db.sync();
-  // }
-  // db.link([Flight, Pilot, Aircraft]);
+  if (connectionType === 'mysql') {
+    db = new Database(
+      new MySQLConnector(connectionDetails as MySQLOptions),
+    );
+  } else {
+    db = new Database(
+      new SQLite3Connector(connectionDetails as SQLite3Options),
+    );
+    await db.sync();
+  }
+  db.link([Flight, Pilot, Aircraft]);
 }
 
 export function getConnectionDetails(): {
