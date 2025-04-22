@@ -1,9 +1,9 @@
 import { DataTypes, Model } from 'denodb';
 
 export class Aircraft extends Model {
-  static table = 'aircraft';
-  static timestamps = true;
-  static fields = {
+  static override table = 'aircraft';
+  static override timestamps = true;
+  static override fields = {
     id: {
       type: DataTypes.UUID,
       primaryKey: true,
