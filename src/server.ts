@@ -30,7 +30,7 @@ const app = new Application();
 const router = new Router();
 const port: number = 8000;
 
-router.get('/', (ctx: RouterContext) => {
+router.get('/', (ctx: RouterContext<string>) => {
   ctx.response.body = 'Hello from Deno';
 })
   // flight
