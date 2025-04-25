@@ -3,7 +3,7 @@ import { Flight } from '../Models/Flight.ts';
 import { FlightEntry, FlightNode } from '../types.ts';
 import { ResponseCreator } from '../Models/Response.class.ts';
 
-export const getPilotsFlights = async (ctx: RouterContext) => {
+export const getPilotsFlightsHandler = async (ctx: RouterContext) => {
   const pilotId = ctx.params.pilotId;
   try {
     ctx.response.status = 200;
@@ -23,7 +23,7 @@ export const getPilotsFlights = async (ctx: RouterContext) => {
   }
 };
 
-export const startFlight = async (ctx: RouterContext) => {
+export const startFlightHandler = async (ctx: RouterContext) => {
   let flightEntry: FlightEntry;
 
   try {
@@ -62,7 +62,7 @@ export const startFlight = async (ctx: RouterContext) => {
   return;
 };
 
-export const gpsUpdateFlight = async (ctx: RouterContext) => {
+export const gpsUpdateFlightHandler = async (ctx: RouterContext) => {
   const flightId = await ctx.params.flightId;
   const flight = await Flight
     .where('id', '=', flightId.trim().toString())
@@ -116,7 +116,7 @@ export const gpsUpdateFlight = async (ctx: RouterContext) => {
   }
 };
 
-export const endFlight = async (ctx: RouterContext) => {
+export const endFlightHandler = async (ctx: RouterContext) => {
   const flightEndNode = await ctx.request.body().value as FlightNode;
   const flightId = await ctx.params.flightId;
   const startedFlight = await Flight
@@ -163,21 +163,21 @@ export const endFlight = async (ctx: RouterContext) => {
   }
 };
 
-export const getFlight = async (ctx: RouterContext) => {
+export const getFlightHandler = async (ctx: RouterContext) => {
   const flightId = await ctx.request.body().value;
   // get flight from DB
   ctx.response.status = 201;
   ctx.response.body = { flightId };
 };
 
-export const updateFlight = async (ctx: RouterContext) => {
+export const updateFlightHandler = async (ctx: RouterContext) => {
   const flightId = await ctx.request.body().value;
   // update flight in DB
   ctx.response.status = 201;
   ctx.response.body = { flightId };
 };
 
-export const deleteFlight = async (ctx: RouterContext) => {
+export const deleteFlightHandler = async (ctx: RouterContext) => {
   const flightId = ctx.params.flightId;
   const existingFlight = await Flight
     .where('id', '=', flightId.trim().toString())

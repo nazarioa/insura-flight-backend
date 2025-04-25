@@ -1,12 +1,12 @@
 import { RouterContext } from 'jsr:@oak/oak/router';
 import { Pilot } from '../Models/Pilot.ts';
 
-export const getAllPilots = async (ctx: RouterContext) => {
+export const getAllPilotsHandler = async (ctx: RouterContext) => {
   ctx.response.body = await Pilot.all();
   ctx.response.status = 200;
 };
 
-export const createPilot = async (ctx: RouterContext) => {
+export const createPilotHandler = async (ctx: RouterContext) => {
   const { firstName, lastName } = await ctx.request.body().value;
 
   const existingPilot = await Pilot
@@ -32,7 +32,7 @@ export const createPilot = async (ctx: RouterContext) => {
   }
 };
 
-export const getPilot = async (ctx: RouterContext) => {
+export const getPilotHandler = async (ctx: RouterContext) => {
   const id = ctx.params.id;
   const existingPilot = await Pilot
     .where('id', '=', id.trim().toString())
@@ -49,7 +49,7 @@ export const getPilot = async (ctx: RouterContext) => {
   return;
 };
 
-export const updatePilot = async (ctx: RouterContext) => {
+export const updatePilotHandler = async (ctx: RouterContext) => {
   const id = ctx.params.id;
   const existingPilot = await Pilot
     .where('id', '=', id.trim().toString())
@@ -77,7 +77,7 @@ export const updatePilot = async (ctx: RouterContext) => {
   }
 };
 
-export const deletePilot = async (ctx: RouterContext) => {
+export const deletePilotHandler = async (ctx: RouterContext) => {
   const id = ctx.params.id;
   const existingPilot = await Pilot
     .where('id', '=', id.trim().toString())

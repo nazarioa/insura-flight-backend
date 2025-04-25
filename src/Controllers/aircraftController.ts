@@ -1,13 +1,13 @@
 import { RouterContext } from 'jsr:@oak/oak/router';
 import { Aircraft } from '../Models/Aircraft.ts';
 
-export const getAllAircraft = async (ctx: RouterContext) => {
+export const getAllAircraftHandler = async (ctx: RouterContext) => {
   ctx.response.body = await Aircraft.all();
   ctx.response.status = 200;
   return;
 };
 
-export const createAircraft = async (ctx: RouterContext) => {
+export const createAircraftHandler = async (ctx: RouterContext) => {
   const { nNumber, make, model } = await ctx.request.body().value;
 
   const existingAircraft = await Aircraft
@@ -33,7 +33,7 @@ export const createAircraft = async (ctx: RouterContext) => {
   }
 };
 
-export const getAircraft = async (ctx: RouterContext) => {
+export const getAircraftHandler = async (ctx: RouterContext) => {
   const nNumber = ctx.params.nNumber;
   const existingAircraft = await Aircraft
     .where('nNumber', '=', nNumber.trim().toString())
@@ -50,7 +50,7 @@ export const getAircraft = async (ctx: RouterContext) => {
   return;
 };
 
-export const updateAircraft = async (ctx: RouterContext) => {
+export const updateAircraftHandler = async (ctx: RouterContext) => {
   const nNumber = ctx.params.nNumber;
   const existingAircraft = await Aircraft
     .where('nNumber', '=', nNumber.trim().toString())
@@ -78,7 +78,7 @@ export const updateAircraft = async (ctx: RouterContext) => {
   }
 };
 
-export const deleteAircraft = async (ctx: RouterContext) => {
+export const deleteAircraftHandler = async (ctx: RouterContext) => {
   const nNumber = ctx.params.nNumber;
   const existingAircraft = await Aircraft
     .where('nNumber', '=', nNumber.trim().toString())
