@@ -21,7 +21,8 @@ import {
   getAllAircraft,
   updateAircraft,
 } from './Controllers/aircraftController.ts';
-import { Application, Router, RouterContext } from 'oak';
+import { Router, RouterContext } from 'jsr:@oak/oak/router';
+import { Application } from 'jsr:@oak/oak/application';
 import { doTheDatabase, getConnectionDetails } from './database-connection.ts';
 import { oakCors } from 'oakCors';
 

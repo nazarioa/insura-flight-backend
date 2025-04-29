@@ -1,4 +1,4 @@
-import { RouterContext } from 'oak';
+import { RouterContext } from 'jsr:@oak/oak/router';
 import { Flight } from '../Models/Flight.ts';
 import { FlightEntry, FlightNode } from '../types.ts';
 import { ResponseCreator } from '../Models/Response.class.ts';

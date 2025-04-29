@@ -3,7 +3,6 @@
     "hook": "deno run --allow-read --allow-write https://deno.land/x/deno_hooks@0.1.0/mod.ts",
     "dev": "deno run --allow-net  --allow-read --allow-write --unstable -- ./src/server.ts"
   },
-  "importMap": "./import_map.json",
   "compilerOptions": {
     "lib": [
       "deno.window"
@@ -52,5 +51,12 @@
         "src/testdata/"
       ]
     }
+  },
+  "imports": {
+    "@oak/oak": "jsr:@oak/oak@^17.1.4",
+    "denodb": "https://deno.land/x/denodb/mod.ts",
+    "oakCors": "https://deno.land/x/cors/mod.ts",
+    "std": "https://deno.land/std@0.177.0/mod.ts",
+    "std@0.178.0": "https://deno.land/std@0.177.0/mod.ts"
   }
 }
