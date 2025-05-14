@@ -2,7 +2,8 @@
   "nodeModulesDir": "auto",
   "tasks": {
     "hook": "deno run --allow-read --allow-write https://deno.land/x/deno_hooks@0.1.0/mod.ts",
-    "dev": "deno run --allow-net  --allow-read --allow-write --unstable -- ./src/server.ts"
+    "dev": "deno run --allow-net  --allow-read --allow-write --unstable -- ./src/server.ts",
+    "generate-db" : "deno run --reload -A npm:prisma@latest generate"
   },
   "compilerOptions": {
     "lib": [
