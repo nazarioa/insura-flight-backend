@@ -24,3 +24,38 @@ enum Level {
   Warn
   Error
 }
+
+model Pilot {
+  id         String   @id @default(uuid())
+  // email     String   @unique
+  first_name String   @map("first_name")
+  last_name  String   @map("last_name")
+  flights    Flight[]
+  created_at DateTime @default(now()) @map("created_at")
+  updated_at DateTime @updatedAt @map("updated_at")
+}
+
+model Flight {
+  id                  String   @id @default(uuid())
+  aircraft_n_number   String   @map("aircraft_n_number")
+  pilot_id            String   @map("pilot_id")
+  pilot               Pilot    @relation(fields: [pilot_id], references: [id])
+  start_gps_latitude  Float?   @map("start_gps_latitude")
+  end_gps_latitude    Float?   @map("end_gps_latitude")
+  start_gps_longitude Float?   @map("start_gps_longitude")
+  end_gps_longitude   Float?   @map("end_gps_longitude")
+  start_time          Int      @map("start_time")
+  end_time            Int?     @map("end_time")
+  duration_minutes    Float?   @map("duration_minutes")
+  created_at          DateTime @default(now()) @map("created_at")
+  updated_at          DateTime @updatedAt @map("updated_at")
+}
+
+model Aircraft {
+  id         String   @id @default(uuid())
+  n_number   String   @unique @map("n_number")
+  make       String   @unique @map("make")
+  model      String   @unique @map("model")
+  created_at DateTime @default(now()) @map("created_at")
+  updated_at DateTime @updatedAt @map("updated_at")
+}
