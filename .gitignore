@@ -1,2 +1,9 @@
 deno.lock
+
+.env
+
 db/
+prisma/*.db-journal
+prisma/*.db
+generated/client/
+generated/prisma/
