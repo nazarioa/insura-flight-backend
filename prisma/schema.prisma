@@ -2,9 +2,11 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 generator client {
-  provider        = "prisma-client-js"
+  binaryTargets   = ["native", "darwin-arm64"]
+  output          = "./generated/client"
   previewFeatures = ["deno"]
-  output          = "../generated/client"
+  provider        = "prisma-client-js"
+  relationMode    = "prisma"
 }
 
 datasource db {
