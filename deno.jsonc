@@ -4,6 +4,7 @@
     "hook": "deno run --allow-read --allow-write https://deno.land/x/deno_hooks@0.1.0/mod.ts",
     "dev": "deno run --allow-net  --allow-read --allow-write --unstable -- ./src/server.ts",
     "prisma": "deno run -A npm:prisma",
+    "prisma:migrate-reset": "deno task prisma migrate reset",
     "prisma:generate": "deno task prisma generate --schema ./prisma/schema.prisma && deno task prisma:patch",
     "prisma:patch": "deno run -A prisma/patch.ts"
   },
