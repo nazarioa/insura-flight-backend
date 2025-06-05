@@ -35,6 +35,8 @@ model Pilot {
   flights    Flight[]
   created_at DateTime @default(now()) @map("created_at")
   updated_at DateTime @updatedAt @map("updated_at")
+
+  @@map("pilots")
 }
 
 model Flight {
@@ -51,6 +53,8 @@ model Flight {
   duration_minutes    Float?   @map("duration_minutes")
   created_at          DateTime @default(now()) @map("created_at")
   updated_at          DateTime @updatedAt @map("updated_at")
+
+  @@map("flights")
 }
 
 model Aircraft {
@@ -60,4 +64,6 @@ model Aircraft {
   model      String   @unique @map("model")
   created_at DateTime @default(now()) @map("created_at")
   updated_at DateTime @updatedAt @map("updated_at")
+
+  @@map("aircraft")
 }
