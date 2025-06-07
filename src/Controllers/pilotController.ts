@@ -48,11 +48,15 @@ export const createPilotHandler = async (
   }
 };
 
-export const getPilotHandler = async (ctx: RouterContext) => {
+export const getPilotHandler = async (
+  ctx: RouterContext<'/pilot/:id', { id: string }>,
+) => {
   const id = ctx.params.id;
-  const existingPilot = await Pilot
-    .where('id', '=', id.trim().toString())
-    .first();
+  const existingPilot = await prisma.pilot.findFirst({
+    where: {
+      'id': id.trim(),
+    },
+  });
 
   if (!existingPilot) {
     ctx.response.status = 404;
