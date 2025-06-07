@@ -1,8 +1,11 @@
 import { RouterContext } from 'jsr:@oak/oak/router';
 import { Pilot } from '../Models/Pilot.ts';
+import { PrismaClient } from '../../prisma/client.ts';
 
-export const getAllPilotsHandler = async (ctx: RouterContext) => {
-  ctx.response.body = await Pilot.all();
+const prisma = PrismaClient;
+
+export const getAllPilotsHandler = async (ctx: RouterContext<'/pilots'>) => {
+  ctx.response.body = await prisma.pilot.findMany();
   ctx.response.status = 200;
 };
 
