@@ -69,11 +69,13 @@ export const getPilotHandler = async (
   return;
 };
 
-export const updatePilotHandler = async (ctx: RouterContext) => {
+export const updatePilotHandler = async (
+  ctx: RouterContext<'/pilot/:id', { id: string }>,
+) => {
   const id = ctx.params.id;
-  const existingPilot = await Pilot
-    .where('id', '=', id.trim().toString())
-    .first();
+  const existingPilot = await prisma.pilot.findFirst({
+    where: { id: id.trim() },
+  });
 
   if (!existingPilot) {
     ctx.response.status = 404;
@@ -81,12 +83,21 @@ export const updatePilotHandler = async (ctx: RouterContext) => {
     return;
   }
 
-  const { firstName, lastName } = await ctx.request.body().value;
-  existingPilot.firstName = firstName;
-  existingPilot.lastName = lastName;
+  const requestBody = await ctx.request.body.json();
+  const { firstName, lastName } = requestBody ??
+    { lastName: '', firstName: '' };
 
   try {
-    await existingPilot.update();
+    await prisma.pilot.update({
+      where: {
+        id: existingPilot.id,
+      },
+      data: {
+        first_name: firstName.trim(),
+        last_name: lastName.trim(),
+      },
+    });
+
     ctx.response.body = { 'message': 'Pilot updated' };
     ctx.response.status = 201;
     return;
