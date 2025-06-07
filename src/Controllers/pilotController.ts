@@ -108,11 +108,15 @@ export const updatePilotHandler = async (
   }
 };
 
-export const deletePilotHandler = async (ctx: RouterContext) => {
+export const deletePilotHandler = async (
+  ctx: RouterContext<'/pilot/:id', { id: string }>,
+) => {
   const id = ctx.params.id;
-  const existingPilot = await Pilot
-    .where('id', '=', id.trim().toString())
-    .first();
+  const existingPilot = await prisma.pilot.findFirst({
+    where: {
+      id: id.trim(),
+    },
+  });
 
   if (!existingPilot) {
     ctx.response.status = 200;
@@ -121,7 +125,11 @@ export const deletePilotHandler = async (ctx: RouterContext) => {
   }
 
   try {
-    await existingPilot.delete();
+    await prisma.pilot.delete({
+      where: {
+        id: existingPilot.id,
+      },
+    });
     ctx.response.status = 200;
     ctx.response.body = { 'message': 'Pilot deleted' };
   } catch (e) {
