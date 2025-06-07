@@ -9,13 +9,19 @@ export const getAllPilotsHandler = async (ctx: RouterContext<'/pilots'>) => {
   ctx.response.status = 200;
 };
 
-export const createPilotHandler = async (ctx: RouterContext) => {
-  const { firstName, lastName } = await ctx.request.body().value;
+export const createPilotHandler = async (
+  ctx: RouterContext<'/pilot', { firstName: string; lastName: string }>,
+) => {
+  const requestBody = await ctx.request.body.json();
+  const { firstName, lastName } = requestBody ??
+    { lastName: '', firstName: '' };
 
-  const existingPilot = await Pilot
-    .where('firstName', '=', firstName.trim().toString())
-    .where('lastName', '=', lastName.trim().toString())
-    .first();
+  const existingPilot = await prisma.pilot.findFirst({
+    where: {
+      first_name: firstName.trim(),
+      last_name: lastName.trim(),
+    },
+  });
 
   if (existingPilot) {
     ctx.response.status = 403;
@@ -23,9 +29,16 @@ export const createPilotHandler = async (ctx: RouterContext) => {
     return;
   }
 
+  const id = crypto.randomUUID();
   try {
-    const id = crypto.randomUUID();
-    await Pilot.create({ id, firstName, lastName });
+    await prisma.pilot.create({
+      data: {
+        id,
+        first_name: firstName,
+        last_name: lastName,
+      },
+    });
+
     ctx.response.body = { 'message': 'Pilot created' };
     ctx.response.status = 201;
     return;
