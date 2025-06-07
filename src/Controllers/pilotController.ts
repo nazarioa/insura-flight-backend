@@ -54,7 +54,7 @@ export const getPilotHandler = async (
   const id = ctx.params.id;
   const existingPilot = await prisma.pilot.findFirst({
     where: {
-      'id': id.trim(),
+      id: id.trim(),
     },
   });
 
