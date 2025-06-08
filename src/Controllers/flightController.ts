@@ -1,16 +1,26 @@
 import { RouterContext } from 'jsr:@oak/oak/router';
-import { Flight } from '../Models/Flight.ts';
-import { FlightEntry, FlightNode } from '../types.ts';
+import {
+  convFlightEntryRequestToFlightEntryDto,
+  isFlightEntryRequest,
+} from '../Models/Flight.ts';
+import { FlightEntryRequest } from '../types.ts';
 import { ResponseCreator } from '../Models/Response.class.ts';
+import { PrismaClient } from '../../prisma/client.ts';
 
-export const getPilotsFlightsHandler = async (ctx: RouterContext) => {
+const prisma = PrismaClient;
+
+export const getPilotsFlightsHandler = async (
+  ctx: RouterContext<'/flights/:pilotId', { pilotId: string }>,
+) => {
   const pilotId = ctx.params.pilotId;
   try {
     ctx.response.status = 200;
-    ctx.response.body = await Flight
-      .where('pilotId', '=', pilotId.trim().toString())
-      .limit(200)
-      .all();
+    ctx.response.body = await prisma.flight.findMany({
+      take: 200,
+      where: {
+        pilot_id: pilotId.trim().toString(),
+      },
+    });
     return;
   } catch (e) {
     const response = new ResponseCreator(
@@ -23,11 +33,17 @@ export const getPilotsFlightsHandler = async (ctx: RouterContext) => {
   }
 };
 
-export const startFlightHandler = async (ctx: RouterContext) => {
-  let flightEntry: FlightEntry;
+export const startFlightHandler = async (
+  ctx: RouterContext<'/flight/start', FlightEntryRequest>,
+) => {
+  let entryRequest: FlightEntryRequest = {
+    aircraftNNumber: '',
+    dateTimeEpoc: '',
+    pilotId: '',
+  };
 
   try {
-    flightEntry = await ctx.request.body().value as FlightEntry;
+    entryRequest = await ctx.request.body.json() as FlightEntryRequest;
   } catch (e) {
     const response = new ResponseCreator(402, 'Bad flight creation data');
     ctx.response.body = response.payload;
@@ -35,10 +51,10 @@ export const startFlightHandler = async (ctx: RouterContext) => {
     return;
   }
 
-  if (!flightEntry) {
+  if (!entryRequest || !isFlightEntryRequest(entryRequest)) {
     const response = new ResponseCreator(
       500,
-      'Something went wrong' + JSON.stringify(flightEntry ?? {}),
+      'Something went wrong' + JSON.stringify(entryRequest ?? {}),
     );
     ctx.response.body = response.payload;
     ctx.response.status = response.status;
@@ -46,11 +62,14 @@ export const startFlightHandler = async (ctx: RouterContext) => {
   }
 
   const id = crypto.randomUUID();
-  await Flight.create({
-    id,
-    aircraftNNumber: flightEntry.aircraftNNumber,
-    pilotId: flightEntry.pilotId,
-    startTime: flightEntry.dateTimeEpoc,
+  const flightStartNode = convFlightEntryRequestToFlightEntryDto(entryRequest);
+  await prisma.flight.create({
+    data: {
+      id,
+      aircraft_n_number: flightStartNode.aircraft_n_number,
+      pilot_id: flightStartNode.pilot_id,
+      start_time: flightStartNode.datetime_epoc,
+    },
   });
   const response = new ResponseCreator(
     201,
@@ -62,11 +81,15 @@ export const startFlightHandler = async (ctx: RouterContext) => {
   return;
 };
 
-export const gpsUpdateFlightHandler = async (ctx: RouterContext) => {
-  const flightId = await ctx.params.flightId;
-  const flight = await Flight
-    .where('id', '=', flightId.trim().toString())
-    .first();
+export const gpsUpdateFlightHandler = async (
+  ctx: RouterContext<'/flight/gps-update/:flightId', { flightId: string }>,
+) => {
+  const flightId = ctx.params.flightId.trim().toString();
+  const flight = await prisma.flight.findFirst({
+    where: {
+      id: flightId,
+    },
+  });
 
   if (!flight) {
     const response = new ResponseCreator(
@@ -79,11 +102,19 @@ export const gpsUpdateFlightHandler = async (ctx: RouterContext) => {
     return;
   }
 
-  const flightGpsUpdate = await ctx.request.body().value as FlightNode;
+  const flightGpsUpdate = await ctx.request.body.json();
+  // todo validate flightGpsUpdate is a valid flgiht node
+
   if (flightGpsUpdate.flightNode === 'start') {
-    flight.startGpsLongitude = flightGpsUpdate.gpsLongitude;
-    flight.startGpsLatitude = flightGpsUpdate.gpsLatitude;
-    await flight.update();
+    await prisma.flight.update({
+      where: {
+        id: flight.id,
+      },
+      data: {
+        start_gps_longitude: flightGpsUpdate.gpsLongitude,
+        start_gps_latitude: flightGpsUpdate.gpsLatitude,
+      },
+    });
     const response = new ResponseCreator(
       200,
       'Updated start gps for flight',
@@ -93,9 +124,15 @@ export const gpsUpdateFlightHandler = async (ctx: RouterContext) => {
     ctx.response.body = response.payload;
     return;
   } else if (flightGpsUpdate.flightNode === 'end') {
-    flight.endGpsLongitude = flightGpsUpdate.gpsLongitude;
-    flight.endGpsLatitude = flightGpsUpdate.gpsLatitude;
-    await flight.update();
+    await prisma.flight.update({
+      where: {
+        id: flight.id,
+      },
+      data: {
+        end_gps_longitude: flightGpsUpdate.gpsLongitude,
+        end_gps_latitude: flightGpsUpdate.gpsLatitude,
+      },
+    });
     const response = new ResponseCreator(
       200,
       'Updated end gps for flight',
@@ -116,14 +153,41 @@ export const gpsUpdateFlightHandler = async (ctx: RouterContext) => {
   }
 };
 
-export const endFlightHandler = async (ctx: RouterContext) => {
-  const flightEndNode = await ctx.request.body().value as FlightNode;
-  const flightId = await ctx.params.flightId;
-  const startedFlight = await Flight
-    .where('id', '=', flightId.trim().toString())
-    // Where null is not yet supported
-    // .where('endTime', '=', null)
-    .first();
+export const endFlightHandler = async (
+  ctx: RouterContext<'/flight/end/:flightId', { flightId: string }>,
+) => {
+  let entryRequest: FlightEntryRequest = {
+    aircraftNNumber: '',
+    dateTimeEpoc: '',
+    pilotId: '',
+  };
+
+  try {
+    entryRequest = await ctx.request.body.json() as FlightEntryRequest;
+  } catch (e) {
+    const response = new ResponseCreator(402, 'Bad flight end data');
+    ctx.response.body = response.payload;
+    ctx.response.status = response.status;
+    return;
+  }
+
+  if (!entryRequest || !isFlightEntryRequest(entryRequest)) {
+    const response = new ResponseCreator(
+      500,
+      'Something went wrong' + JSON.stringify(entryRequest ?? {}),
+    );
+    ctx.response.body = response.payload;
+    ctx.response.status = response.status;
+    return;
+  }
+
+  const flightId = ctx.params?.flightId?.trim()?.toString() ?? '';
+  const startedFlight = await prisma.flight.findFirst({
+    where: {
+      id: flightId,
+      end_time: null,
+    },
+  });
 
   if (!startedFlight) {
     const response = new ResponseCreator(
@@ -136,14 +200,21 @@ export const endFlightHandler = async (ctx: RouterContext) => {
     return;
   }
 
+  const flightEndNode = convFlightEntryRequestToFlightEntryDto(entryRequest);
   const flightDurationInMinutes = Math.floor(
-    (flightEndNode.dateTimeEpoc - startedFlight.startTime) / 60000,
+    (flightEndNode.datetime_epoc - startedFlight.start_time) / 60000,
   );
 
   try {
-    startedFlight.endTime = flightEndNode.dateTimeEpoc;
-    startedFlight.durationMinutes = flightDurationInMinutes;
-    startedFlight.update();
+    await prisma.flight.update({
+      data: {
+        duration_minutes: flightDurationInMinutes,
+        end_time: flightEndNode.datetime_epoc,
+      },
+      where: {
+        id: startedFlight.id,
+      },
+    });
     const response = new ResponseCreator(
       201,
       'End of flight recorded successfully',
@@ -163,25 +234,31 @@ export const endFlightHandler = async (ctx: RouterContext) => {
   }
 };
 
-export const getFlightHandler = async (ctx: RouterContext) => {
-  const flightId = await ctx.request.body().value;
+export const getFlightHandler = async (ctx: RouterContext<'/flight/:id'>) => {
+  const flightId = ctx.params?.id?.trim()?.toString() ?? '';
   // get flight from DB
   ctx.response.status = 201;
   ctx.response.body = { flightId };
 };
 
-export const updateFlightHandler = async (ctx: RouterContext) => {
-  const flightId = await ctx.request.body().value;
+export const updateFlightHandler = async (
+  ctx: RouterContext<'/flight/:id'>,
+) => {
+  const flightId = ctx.params?.id?.trim()?.toString() ?? '';
   // update flight in DB
   ctx.response.status = 201;
   ctx.response.body = { flightId };
 };
 
-export const deleteFlightHandler = async (ctx: RouterContext) => {
-  const flightId = ctx.params.flightId;
-  const existingFlight = await Flight
-    .where('id', '=', flightId.trim().toString())
-    .first();
+export const deleteFlightHandler = async (
+  ctx: RouterContext<'/flight/:flightId'>,
+) => {
+  const flightId = ctx.params?.flightId?.trim()?.toString() ?? '';
+  const existingFlight = await prisma.flight.findFirst({
+    where: {
+      id: flightId,
+    },
+  });
 
   if (!existingFlight) {
     const response = new ResponseCreator(200, 'Flight deleted');
@@ -191,7 +268,11 @@ export const deleteFlightHandler = async (ctx: RouterContext) => {
   }
 
   try {
-    await existingFlight.delete();
+    await prisma.flight.delete({
+      where: {
+        id: existingFlight.id,
+      },
+    });
     const response = new ResponseCreator(200, 'Flight deleted');
     ctx.response.status = response.status;
     ctx.response.body = response.payload;
