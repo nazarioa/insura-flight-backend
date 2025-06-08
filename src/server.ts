@@ -18,7 +18,7 @@ router.get('/', (ctx: RouterContext<string>) => {
   .get('/flight/:id', flightC.getFlightHandler)
   .put('/flight/:id', flightC.updateFlightHandler)
   .post('/flight/end/:flightId', flightC.endFlightHandler)
-  .put('/flight/gps-up.date/:flightId', flightC.gpsUpdateFlightHandler)
+  .put('/flight/gps-update/:flightId', flightC.gpsUpdateFlightHandler)
   .post('/flight/start', flightC.startFlightHandler)
   .delete('/flight/:flightId', flightC.deleteFlightHandler)
   // pilot
