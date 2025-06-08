@@ -42,7 +42,13 @@ export const createPilotHandler = async (
     ctx.response.status = 201;
     return;
   } catch (e) {
-    ctx.response.body = { 'error': e.toString() };
+    if (e instanceof Error) {
+      ctx.response.body = {
+        'error': `Pilot could not be created ${e.toString()}`,
+      };
+    } else {
+      ctx.response.body = { 'error': 'Pilot could not be created' };
+    }
     ctx.response.status = 500;
   }
 };
