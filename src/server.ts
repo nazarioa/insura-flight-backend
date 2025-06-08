@@ -3,7 +3,6 @@ import { Application } from 'jsr:@oak/oak/application';
 import * as flightC from './Controllers/flightController.ts';
 import * as pilotC from './Controllers/pilotController.ts';
 import * as aircraftC from './Controllers/aircraftController.ts';
-import { doTheDatabase, getConnectionDetails } from './database-connection.ts';
 import { oakCors } from 'oakCors';
 
 const app = new Application();
@@ -40,7 +39,5 @@ app.use(oakCors());
 app.use(router.routes());
 app.use(router.allowedMethods());
 
-const { connectionType, connectionDetails } = getConnectionDetails();
-await doTheDatabase(connectionType, connectionDetails);
 app.listen({ port });
 console.log(`Server is running on port ${port}`);
