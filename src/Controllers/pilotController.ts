@@ -1,5 +1,5 @@
 import { RouterContext } from 'jsr:@oak/oak/router';
-import { PrismaClient } from '../../prisma/client.ts';
+import { PrismaClient } from '@prisma/client';
 
 const prisma = PrismaClient;
 

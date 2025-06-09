@@ -5,7 +5,7 @@ import {
 } from '../Models/Flight.ts';
 import { FlightEntryRequest } from '../types.ts';
 import { ResponseCreator } from '../Models/Response.class.ts';
-import { PrismaClient } from '../../prisma/client.ts';
+import { PrismaClient } from '@prisma/client';
 
 const prisma = PrismaClient;
 
