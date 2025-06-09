@@ -1,18 +1,26 @@
-import { RouterContext } from 'oak';
-import { Pilot } from '../Models/Pilot.ts';
+import { RouterContext } from 'jsr:@oak/oak/router';
+import { PrismaClient } from '@prisma/client';
 
-export const getAllPilots = async (ctx: RouterContext) => {
-  ctx.response.body = await Pilot.all();
+const prisma = PrismaClient;
+
+export const getAllPilotsHandler = async (ctx: RouterContext<'/pilots'>) => {
+  ctx.response.body = await prisma.pilot.findMany();
   ctx.response.status = 200;
 };
 
-export const createPilot = async (ctx: RouterContext) => {
-  const { firstName, lastName } = await ctx.request.body().value;
+export const createPilotHandler = async (
+  ctx: RouterContext<'/pilot', { firstName: string; lastName: string }>,
+) => {
+  const requestBody = await ctx.request.body.json();
+  const { firstName, lastName } = requestBody ??
+    { lastName: '', firstName: '' };
 
-  const existingPilot = await Pilot
-    .where('firstName', '=', firstName.trim().toString())
-    .where('lastName', '=', lastName.trim().toString())
-    .first();
+  const existingPilot = await prisma.pilot.findFirst({
+    where: {
+      first_name: firstName.trim(),
+      last_name: lastName.trim(),
+    },
+  });
 
   if (existingPilot) {
     ctx.response.status = 403;
@@ -20,23 +28,40 @@ export const createPilot = async (ctx: RouterContext) => {
     return;
   }
 
+  const id = crypto.randomUUID();
   try {
-    const id = crypto.randomUUID();
-    await Pilot.create({ id, firstName, lastName });
+    await prisma.pilot.create({
+      data: {
+        id,
+        first_name: firstName,
+        last_name: lastName,
+      },
+    });
+
     ctx.response.body = { 'message': 'Pilot created' };
     ctx.response.status = 201;
     return;
   } catch (e) {
-    ctx.response.body = { 'error': e.toString() };
+    if (e instanceof Error) {
+      ctx.response.body = {
+        'error': `Pilot could not be created ${e.toString()}`,
+      };
+    } else {
+      ctx.response.body = { 'error': 'Pilot could not be created' };
+    }
     ctx.response.status = 500;
   }
 };
 
-export const getPilot = async (ctx: RouterContext) => {
+export const getPilotHandler = async (
+  ctx: RouterContext<'/pilot/:id', { id: string }>,
+) => {
   const id = ctx.params.id;
-  const existingPilot = await Pilot
-    .where('id', '=', id.trim().toString())
-    .first();
+  const existingPilot = await prisma.pilot.findFirst({
+    where: {
+      id: id.trim(),
+    },
+  });
 
   if (!existingPilot) {
     ctx.response.status = 404;
@@ -49,11 +74,13 @@ export const getPilot = async (ctx: RouterContext) => {
   return;
 };
 
-export const updatePilot = async (ctx: RouterContext) => {
+export const updatePilotHandler = async (
+  ctx: RouterContext<'/pilot/:id', { id: string }>,
+) => {
   const id = ctx.params.id;
-  const existingPilot = await Pilot
-    .where('id', '=', id.trim().toString())
-    .first();
+  const existingPilot = await prisma.pilot.findFirst({
+    where: { id: id.trim() },
+  });
 
   if (!existingPilot) {
     ctx.response.status = 404;
@@ -61,12 +88,21 @@ export const updatePilot = async (ctx: RouterContext) => {
     return;
   }
 
-  const { firstName, lastName } = await ctx.request.body().value;
-  existingPilot.firstName = firstName;
-  existingPilot.lastName = lastName;
+  const requestBody = await ctx.request.body.json();
+  const { firstName, lastName } = requestBody ??
+    { lastName: '', firstName: '' };
 
   try {
-    await existingPilot.update();
+    await prisma.pilot.update({
+      where: {
+        id: existingPilot.id,
+      },
+      data: {
+        first_name: firstName.trim(),
+        last_name: lastName.trim(),
+      },
+    });
+
     ctx.response.body = { 'message': 'Pilot updated' };
     ctx.response.status = 201;
     return;
@@ -77,11 +113,15 @@ export const updatePilot = async (ctx: RouterContext) => {
   }
 };
 
-export const deletePilot = async (ctx: RouterContext) => {
+export const deletePilotHandler = async (
+  ctx: RouterContext<'/pilot/:id', { id: string }>,
+) => {
   const id = ctx.params.id;
-  const existingPilot = await Pilot
-    .where('id', '=', id.trim().toString())
-    .first();
+  const existingPilot = await prisma.pilot.findFirst({
+    where: {
+      id: id.trim(),
+    },
+  });
 
   if (!existingPilot) {
     ctx.response.status = 200;
@@ -90,7 +130,11 @@ export const deletePilot = async (ctx: RouterContext) => {
   }
 
   try {
-    await existingPilot.delete();
+    await prisma.pilot.delete({
+      where: {
+        id: existingPilot.id,
+      },
+    });
     ctx.response.status = 200;
     ctx.response.body = { 'message': 'Pilot deleted' };
   } catch (e) {

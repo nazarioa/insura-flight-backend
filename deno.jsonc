@@ -1,43 +1,71 @@
 {
+  "nodeModulesDir": "auto",
   "tasks": {
     "hook": "deno run --allow-read --allow-write https://deno.land/x/deno_hooks@0.1.0/mod.ts",
-    "dev": "deno run --allow-net  --allow-read --allow-write --unstable -- ./src/server.ts"
+    "dev": "deno run --allow-net  --allow-read --allow-write -- ./src/server.ts",
+    "build:prod": "deno run prisma:generate && deno compile --allow-net --allow-read --allow-write --allow-env --output ./dist/server.js ./src/server.ts",
+    "prisma": "deno run -A npm:prisma",
+    "prisma:migrate-reset": "deno task prisma migrate reset",
+    "prisma:generate": "deno task prisma generate --schema ./prisma/schema.prisma && deno task prisma:patch",
+    "prisma:patch": "deno run -A prisma/patch.ts"
   },
-  "importMap": "./import_map.json",
   "compilerOptions": {
-    "allowJs": true,
-    "lib": ["deno.window"],
+    "lib": [
+      "deno.window"
+    ],
     "strict": true
   },
   "lint": {
-    "files": {
-      "include": ["src/"],
-      "exclude": ["src/testdata/"]
-    },
+    "include": [
+      "src/"
+    ],
+    "exclude": [
+      "src/testdata/"
+    ],
     "rules": {
-      "tags": ["recommended"],
-      "include": ["ban-untagged-todo"],
-      "exclude": ["no-unused-vars"]
+      "tags": [
+        "recommended"
+      ],
+      "include": [
+        "ban-untagged-todo"
+      ],
+      "exclude": [
+        "no-unused-vars"
+      ]
     }
   },
   "fmt": {
-    "files": {
-      "include": ["src/"],
-      "exclude": ["src/testdata/"]
-    },
-    "options": {
-      "useTabs": false,
-      "lineWidth": 80,
-      "indentWidth": 2,
-      "semiColons": true,
-      "singleQuote": true,
-      "proseWrap": "preserve"
-    }
+    "include": [
+      "src/"
+    ],
+    "exclude": [
+      "src/testdata/"
+    ],
+    "useTabs": false,
+    "lineWidth": 80,
+    "indentWidth": 2,
+    "semiColons": true,
+    "singleQuote": true,
+    "proseWrap": "preserve"
   },
   "test": {
     "files": {
-      "include": ["src/"],
-      "exclude": ["src/testdata/"]
+      "include": [
+        "src/"
+      ],
+      "exclude": [
+        "src/testdata/"
+      ]
     }
+  },
+  "imports": {
+    "@oak/oak": "jsr:@oak/oak@^17.1.4",
+    "@prisma/client": "npm:@prisma/client@^6.9.0",
+    "@std/dotenv": "jsr:@std/dotenv@^0.225.2",
+    "@std/path": "jsr:@std/path@^1.0.6",
+    "oakCors": "https://deno.land/x/cors/mod.ts",
+    "prisma": "npm:prisma@^6.7.0",
+    "std": "https://deno.land/std@0.177.0/mod.ts",
+    "std@0.178.0": "https://deno.land/std@0.177.0/mod.ts"
   }
 }

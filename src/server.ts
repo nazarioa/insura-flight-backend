@@ -1,57 +1,37 @@
-import {
-  deleteFlight,
-  endFlight,
-  getFlight,
-  getPilotsFlights,
-  gpsUpdateFlight,
-  startFlight,
-  updateFlight,
-} from './Controllers/flightController.ts';
-import {
-  createPilot,
-  deletePilot,
-  getAllPilots,
-  getPilot,
-  updatePilot,
-} from './Controllers/pilotController.ts';
-import {
-  createAircraft,
-  deleteAircraft,
-  getAircraft,
-  getAllAircraft,
-  updateAircraft,
-} from './Controllers/aircraftController.ts';
-import { Application, Router, RouterContext } from 'oak';
-import { doTheDatabase, getConnectionDetails } from './database-connection.ts';
+import { Router, RouterContext } from 'jsr:@oak/oak/router';
+import { Application } from 'jsr:@oak/oak/application';
+import * as flightC from './Controllers/flightController.ts';
+import * as pilotC from './Controllers/pilotController.ts';
+import * as aircraftC from './Controllers/aircraftController.ts';
 import { oakCors } from 'oakCors';
 
 const app = new Application();
 const router = new Router();
 const port: number = 8000;
 
-router.get('/', (ctx: RouterContext) => {
+router.get('/', (ctx: RouterContext<string>) => {
   ctx.response.body = 'Hello from Deno';
 })
   // flight
-  .get('/flights/:pilotId', getPilotsFlights)
-  .get('/flight/:id', getFlight)
-  .put('/flight/:id', updateFlight)
-  .post('/flight/end/:flightId', endFlight)
-  .put('/flight/gps-update/:flightId', gpsUpdateFlight)
-  .post('/flight/start', startFlight)
-  .delete('/flight/:flightId', deleteFlight)
+  .get('/flights/:pilotId', flightC.getPilotsFlightsHandler)
+  .get('/flight/:id', flightC.getFlightHandler)
+  .put('/flight/:id', flightC.updateFlightHandler)
+  .post('/flight/end/:flightId', flightC.endFlightHandler)
+  .put('/flight/gps-update/:flightId', flightC.gpsUpdateFlightHandler)
+  .post('/flight/start', flightC.startFlightHandler)
+  .delete('/flight/:flightId', flightC.deleteFlightHandler)
   // pilot
-  .get('/pilots', getAllPilots)
-  .get('/pilot/:id', getPilot)
-  .post('/pilot', createPilot)
-  .put('/pilot/:id', updatePilot)
-  .delete('/pilot/:id', deletePilot)
+  .get('/pilots', pilotC.getAllPilotsHandler)
+  .get('/pilot/:id', pilotC.getPilotHandler)
+  .post('/pilot', pilotC.createPilotHandler)
+  .put('/pilot/:id', pilotC.updatePilotHandler)
+  .delete('/pilot/:id', pilotC.deletePilotHandler)
   // aircraft
-  .get('/aircraft', getAllAircraft)
-  .get('/aircraft/:nNumber', getAircraft)
-  .post('/aircraft', createAircraft)
-  .put('/aircraft/:nNumber', updateAircraft)
-  .delete('/aircraft/:nNumber', deleteAircraft);
+  .get('/aircraft', aircraftC.getAllAircraftHandler)
+  .get('/aircraft/:nNumber', aircraftC.getAircraftHandler)
+  .post('/aircraft', aircraftC.createAircraftHandler)
+  .put('/aircraft/:nNumber', aircraftC.updateAircraftHandler)
+  .delete('/aircraft/:nNumber', aircraftC.deleteAircraftHandler);
 
 app.use(oakCors());
 
@@ -59,7 +39,5 @@ app.use(oakCors());
 app.use(router.routes());
 app.use(router.allowedMethods());
 
-const { connectionType, connectionDetails } = getConnectionDetails();
-await doTheDatabase(connectionType, connectionDetails);
 app.listen({ port });
 console.log(`Server is running on port ${port}`);

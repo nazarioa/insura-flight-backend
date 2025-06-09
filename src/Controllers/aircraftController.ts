@@ -1,18 +1,31 @@
-import { RouterContext } from 'oak';
-import { Aircraft } from '../Models/Aircraft.ts';
+import { RouterContext } from 'jsr:@oak/oak/router';
+import { PrismaClient } from '@prisma/client';
 
-export const getAllAircraft = async (ctx: RouterContext) => {
-  ctx.response.body = await Aircraft.all();
+const prisma = PrismaClient;
+
+export const getAllAircraftHandler = async (
+  ctx: RouterContext<'/aircraft'>,
+) => {
+  ctx.response.body = await prisma.aircraft.findMany();
   ctx.response.status = 200;
   return;
 };
 
-export const createAircraft = async (ctx: RouterContext) => {
-  const { nNumber, make, model } = await ctx.request.body().value;
+export const createAircraftHandler = async (
+  ctx: RouterContext<
+    '/aircraft',
+    { nNumber: string; make: string; model: string }
+  >,
+) => {
+  const requestBody = await ctx.request.body.json();
+  const { nNumber, make, model } = requestBody ??
+    { nNumber: '', make: '', model: '' };
 
-  const existingAircraft = await Aircraft
-    .where('nNumber', '=', nNumber.trim().toString())
-    .first();
+  const existingAircraft = await prisma.aircraft.findFirst({
+    where: {
+      n_number: nNumber.trim().toString(),
+    },
+  });
 
   if (existingAircraft) {
     ctx.response.status = 403;
@@ -22,22 +35,34 @@ export const createAircraft = async (ctx: RouterContext) => {
 
   try {
     const id = crypto.randomUUID();
-    await Aircraft.create({ id, nNumber, make, model });
+    await prisma.aircraft.create({
+      data: { id, n_number: nNumber, make, model },
+    });
     ctx.response.body = { 'message': 'Aircraft created' };
     ctx.response.status = 201;
     return;
   } catch (e) {
-    ctx.response.body = { 'error': e.toString() };
+    if (e instanceof Error) {
+      ctx.response.body = {
+        'error': `Aircraft could not be created ${e.toString()}`,
+      };
+    } else {
+      ctx.response.body = { 'error': 'Aircraft could not be created' };
+    }
     ctx.response.status = 500;
     return;
   }
 };
 
-export const getAircraft = async (ctx: RouterContext) => {
+export const getAircraftHandler = async (
+  ctx: RouterContext<'/aircraft/:nNumber', { nNumber: string }>,
+) => {
   const nNumber = ctx.params.nNumber;
-  const existingAircraft = await Aircraft
-    .where('nNumber', '=', nNumber.trim().toString())
-    .first();
+  const existingAircraft = await prisma.aircraft.findFirst({
+    where: {
+      n_number: nNumber.trim().toString(),
+    },
+  });
 
   if (!existingAircraft) {
     ctx.response.status = 404;
@@ -50,11 +75,13 @@ export const getAircraft = async (ctx: RouterContext) => {
   return;
 };
 
-export const updateAircraft = async (ctx: RouterContext) => {
+export const updateAircraftHandler = async (
+  ctx: RouterContext<'/aircraft/:nNumber', { nNumber: string }>,
+) => {
   const nNumber = ctx.params.nNumber;
-  const existingAircraft = await Aircraft
-    .where('nNumber', '=', nNumber.trim().toString())
-    .first();
+  const existingAircraft = await prisma.aircraft.findFirst({
+    where: { n_number: nNumber.trim() },
+  });
 
   if (!existingAircraft) {
     ctx.response.status = 404;
@@ -62,12 +89,20 @@ export const updateAircraft = async (ctx: RouterContext) => {
     return;
   }
 
-  const { make, model } = await ctx.request.body().value;
-  existingAircraft.make = make;
-  existingAircraft.model = model;
+  const requestBody = await ctx.request.body.json();
+  const { make, model } = requestBody ??
+    { make: '', model: '' };
 
   try {
-    await existingAircraft.update();
+    await prisma.aircraft.update({
+      where: {
+        n_number: existingAircraft.n_number,
+      },
+      data: {
+        make: make.trim(),
+        model: model.trim(),
+      },
+    });
     ctx.response.body = { 'message': 'Aircraft updated' };
     ctx.response.status = 201;
     return;
@@ -78,11 +113,13 @@ export const updateAircraft = async (ctx: RouterContext) => {
   }
 };
 
-export const deleteAircraft = async (ctx: RouterContext) => {
+export const deleteAircraftHandler = async (
+  ctx: RouterContext<'/aircraft/:nNumber', { nNumber: string }>,
+) => {
   const nNumber = ctx.params.nNumber;
-  const existingAircraft = await Aircraft
-    .where('nNumber', '=', nNumber.trim().toString())
-    .first();
+  const existingAircraft = await prisma.aircraft.findFirst({
+    where: { n_number: nNumber.trim() },
+  });
 
   if (!existingAircraft) {
     ctx.response.status = 200;
@@ -91,7 +128,11 @@ export const deleteAircraft = async (ctx: RouterContext) => {
   }
 
   try {
-    await existingAircraft.delete();
+    await prisma.aircraft.delete({
+      where: {
+        n_number: existingAircraft.n_number,
+      },
+    });
     ctx.response.status = 200;
     ctx.response.body = { 'message': 'Aircraft deleted' };
   } catch (e) {
